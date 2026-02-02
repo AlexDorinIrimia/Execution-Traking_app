@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+
+# Env
+.env
+
+# Terraform local state
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+
+# Keys
+*.pem
+
+# Docker
+*.log
+
+devops_env/
+
+terraform-admin_credentials.csv

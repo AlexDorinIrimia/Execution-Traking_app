@@ -1,2 +1,4 @@
 flask
 pytest
+psycopg2
+python-dotenv
