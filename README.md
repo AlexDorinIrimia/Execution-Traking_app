@@ -29,7 +29,7 @@ Build a production-like platform that:
 6. Applies DevOps best practices (IaC, secrets, environments, CI/CD)
 
 ## 🏗️ High-Level Architecture (Current & Target)
-
+```text
 ┌─────────────┐
 │ Flask API │ (Docker / K8s)
 │ Ingestion │
@@ -47,7 +47,7 @@ Build a production-like platform that:
 ┌────────▼────────┐
 │ Airflow │ ← orchestration
 └─────────────────┘
-
+```
 ## ✅ Project Phases
 
 ### Phase 1 – Application & API (✅ completed)
@@ -118,7 +118,7 @@ Build a production-like platform that:
 ---
 
 ## 📂 Repository Structure (Current)
-
+```text
 .
 ├── ingestion-api/
 │ └── app/
@@ -131,7 +131,7 @@ Build a production-like platform that:
 │ └── outputs.tf
 ├── .gitignore
 ├── README.md
-
+```
 ## 🔐 Configuration
 
 Sensitive values are **not committed**.
