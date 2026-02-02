@@ -118,8 +118,6 @@ Build a production-like platform that:
 ---
 
 ## 📂 Repository Structure (Current)
-```text
-## 📁 Repository Structure
 
 ```text
 .
