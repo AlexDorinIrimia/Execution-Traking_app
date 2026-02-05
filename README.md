@@ -81,7 +81,7 @@ Build a production-like platform that:
 
 ---
 
-### Phase 3 – Containerization & Orchestration (🚧 next)
+### Phase 3 – Containerization & Orchestration (✅ completed)
 - Dockerize the Flask API
 - Use docker-compose for local development
 - Introduce Kubernetes (local + cloud)
@@ -137,6 +137,17 @@ Build a production-like platform that:
 │   ├── provider.tf         
 │   ├── variables.tf        
 │   └── outputs.tf         
+|
+├── k8s/
+│   ├── local/
+│   │   ├── postgres-deployment.yaml
+│   │   ├── postgres-secret.yaml          
+│   │   └── postgres-service.yaml          
+|   ├── cloud/
+│   │   ├── deployment.yaml
+│   │   ├── configmap.yaml
+│   │   ├── secret.yaml          
+│   │   └── service.yaml
 |
 ├── .gitignore
 └── README.md
