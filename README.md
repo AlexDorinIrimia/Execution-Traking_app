@@ -7,7 +7,7 @@
 ![Terraform](https://img.shields.io/badge/Terraform-IaC-purple?logo=terraform)
 ![Linux](https://img.shields.io/badge/Linux-Ubuntu-orange?logo=linux)
 ![Git](https://img.shields.io/badge/Git-VersionControl-red?logo=git)
-![Kubernetes](https://img.shields.io/badge/Kubernetes-Orchestration-blue?logo=dubernetes)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-Orchestration-blue?logo=kubernetes)
 ![Docker](https://img.shields.io/badge/Docker-Containerization-black?logo=docker)
 
 A **Data Engineering + DevOps learning project** that builds a complete execution-tracking system, from API ingestion to cloud infrastructure, orchestration, and transformations.
