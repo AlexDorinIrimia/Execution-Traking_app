@@ -11,5 +11,7 @@ RUN chown -R appuser:appuser /app
 
 USER appuser
 
+ENV PYTHONUNBUFFERED=1
+
 EXPOSE 8000
 CMD ["python", "app.py"]
