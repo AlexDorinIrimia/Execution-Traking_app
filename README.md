@@ -7,6 +7,9 @@
 ![Terraform](https://img.shields.io/badge/Terraform-IaC-purple?logo=terraform)
 ![Linux](https://img.shields.io/badge/Linux-Ubuntu-orange?logo=linux)
 ![Git](https://img.shields.io/badge/Git-VersionControl-red?logo=git)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-Orchestration-blue?logo=kubernetes)
+![Docker](https://img.shields.io/badge/Docker-Containerization-black?logo=docker)
+![dbt](https://img.shields.io/badge/dbt-Data%20Build%20Tool-orange?logo=dbt)
 
 A **Data Engineering + DevOps learning project** that builds a complete execution-tracking system, from API ingestion to cloud infrastructure, orchestration, and transformations.
 
@@ -29,25 +32,25 @@ Build a production-like platform that:
 6. Applies DevOps best practices (IaC, secrets, environments, CI/CD)
 
 ## 🏗️ High-Level Architecture (Current & Target)
-
-┌─────────────┐
-│ Flask API │ (Docker / K8s)
-│ Ingestion │
-└─────┬───────┘
-│
-▼
-┌──────────────────┐
-│ AWS RDS │ ← PostgreSQL (raw / staging)
-└────────┬─────────┘
-│
-┌────────▼────────┐
-│ dbt │ ← transformations
-└────────┬────────┘
-│
-┌────────▼────────┐
-│ Airflow │ ← orchestration
-└─────────────────┘
-
+```text
+┌───────────────────────────┐
+│ Flask API │ (Docker / K8s)|
+│ Ingestion │               |
+└─────────────┬─────────────┘
+              │
+              ▼
+┌────────────────────────────────────────┐
+│ AWS RDS │ ← PostgreSQL (raw / staging) |
+└──────────────────┬─────────────────────┘
+                   │
+┌──────────────────▼─────────────────────┐
+│ dbt │ ← transformations                |
+└──────────────┬─────────────────────────┘
+               │
+┌──────────────▼─────────────┐
+│ Airflow │ ← orchestration  |
+└────────────────────────────┘
+```
 ## ✅ Project Phases
 
 ### Phase 1 – Application & API (✅ completed)
@@ -119,20 +122,69 @@ Build a production-like platform that:
 
 ## 📂 Repository Structure (Current)
 
+```text
 .
 ├── ingestion-api/
-│ ├── app/
-│ ├── app.py
-│ ├── db.py
-│ ├── config.py
-│ └── requirements.txt
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── app.py          
+│   │   ├── config.py       
+|   |   ├── requirements.txt
+│   │   └── db.py           
+│   ├── tests/
+│   │   └── tests.py        
+│   └── Dockerfile         
+│
 ├── terraform/
-│ ├── main.tf
-│ ├── variables.tf
-│ └── outputs.tf
+│   ├── main.tf             
+│   ├── provider.tf         
+│   ├── variables.tf        
+│   └── outputs.tf         
+|
+├── k8s/
+│   ├── local/
+│   │   ├── postgres-deployment.yaml
+│   │   ├── postgres-secret.yaml          
+│   │   └── postgres-service.yaml          
+|   └── cloud/
+│       ├── deployment.yaml
+│       ├── configmap.yaml
+│       ├── secret.yaml          
+│       └── service.yaml
+├── dbt/
+│   └── execution_dbt/
+|       ├── analyses/
+|       ├── logs/
+|       ├── macros/
+|       │   ├── .gitkeep
+│       |   ├── check_db.sql
+│       |   ├── check_tables.sql
+│       |   └── list_dbs.sql
+|       ├── models/
+│       |    ├── analytics/
+│       │    |   ├── analytics.yml
+│       │    |   ├── fct_execution.sql
+│       │    |   └── job_dim.sql
+│       |    └── staging/
+│       |        ├── staging.yml
+│       |        ├── stg_executions.sql
+│       |        └── sources.yml
+|       ├── seeds/
+|       ├── snapshots/
+|       ├── target/
+|       ├── tests/
+|       ├── .env
+|       ├── .gitignore
+|       ├── .user.yml
+|       ├── dbt_project.yml
+|       ├── grant.py
+|       ├── profiles.yml
+|       ├── README.md
+|       └── run_dbt.py
+|
 ├── .gitignore
-├── README.md
-
+└── README.md
+```
 ## 🔐 Configuration
 
 Sensitive values are **not committed**.
