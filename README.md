@@ -9,6 +9,7 @@
 ![Git](https://img.shields.io/badge/Git-VersionControl-red?logo=git)
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-Orchestration-blue?logo=kubernetes)
 ![Docker](https://img.shields.io/badge/Docker-Containerization-black?logo=docker)
+![dbt](https://img.shields.io/badge/dbt-Data%20Build%20Tool-orange?logo=dbt)
 
 A **Data Engineering + DevOps learning project** that builds a complete execution-tracking system, from API ingestion to cloud infrastructure, orchestration, and transformations.
 
@@ -92,7 +93,7 @@ Build a production-like platform that:
 
 ---
 
-### Phase 4 – Data Engineering Layer (🔜 planned)
+### Phase 4 – Data Engineering Layer (✅ completed)
 - dbt project for transformations
 - Raw → staging → analytics models
 - Versioned transformations
@@ -145,11 +146,41 @@ Build a production-like platform that:
 │   │   ├── postgres-deployment.yaml
 │   │   ├── postgres-secret.yaml          
 │   │   └── postgres-service.yaml          
-|   ├── cloud/
-│   │   ├── deployment.yaml
-│   │   ├── configmap.yaml
-│   │   ├── secret.yaml          
-│   │   └── service.yaml
+|   └── cloud/
+│       ├── deployment.yaml
+│       ├── configmap.yaml
+│       ├── secret.yaml          
+│       └── service.yaml
+├── dbt/
+│   └── execution_dbt/
+|       ├── analyses/
+|       ├── logs/
+|       ├── macros/
+|       │   ├── .gitkeep
+│       |   ├── check_db.sql
+│       |   ├── check_tables.sql
+│       |   └── list_dbs.sql
+|       ├── models/
+│       |    ├── analytics/
+│       │    |   ├── analytics.yml
+│       │    |   ├── fct_execution.sql
+│       │    |   └── job_dim.sql
+│       |    └── staging/
+│       |        ├── staging.yml
+│       |        ├── stg_executions.sql
+│       |        └── sources.yml
+|       ├── seeds/
+|       ├── snapshots/
+|       ├── target/
+|       ├── tests/
+|       ├── .env
+|       ├── .gitignore
+|       ├── .user.yml
+|       ├── dbt_project.yml
+|       ├── grant.py
+|       ├── profiles.yml
+|       ├── README.md
+|       └── run_dbt.py
 |
 ├── .gitignore
 └── README.md

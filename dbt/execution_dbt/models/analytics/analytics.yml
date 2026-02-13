@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: fct_execution
+    description: "Fact table of all executions."
+    columns:
+      - name: execution_id
+        tests: [not_null, unique]
+
+  - name: job_dim
+    description: "Distinct list of jobs."
+    columns:
+      - name: job_name
+        tests: [not_null, unique]

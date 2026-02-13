@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: stg_executions
+    description: "Cleaned executions (typed, normalized status, derived duration)."
+    columns:
+      - name: execution_id
+        tests: [not_null, unique]
+      - name: job_name
+        tests: [not_null]
+      - name: run_id
+        tests: [not_null]
+      - name: status
+        tests:
+          - not_null
+          # Adjust to the statuses your API uses
+          - accepted_values:
+              arguments:
+                values: ["success", "failed", "running", "queued", "canceled"]
+      - name: start_time
+        tests: [not_null]
+      - name: end_time
+        tests: [not_null]
