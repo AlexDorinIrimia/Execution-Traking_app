@@ -81,7 +81,7 @@ Build a production-like platform that:
 
 ---
 
-### Phase 3 – Containerization & Orchestration (🚧 next)
+### Phase 3 – Containerization & Orchestration (✅ completed)
 - Dockerize the Flask API
 - Use docker-compose for local development
 - Introduce Kubernetes (local + cloud)
@@ -90,7 +90,7 @@ Build a production-like platform that:
 
 ---
 
-### Phase 4 – Data Engineering Layer (🔜 planned)
+### Phase 4 – Data Engineering Layer (✅ completed)
 - dbt project for transformations
 - Raw → staging → analytics models
 - Versioned transformations
@@ -121,10 +121,11 @@ Build a production-like platform that:
 
 .
 ├── ingestion-api/
-│ └── app/
+│ ├── app/
 │ ├── app.py
 │ ├── db.py
-│ └── routes/
+│ ├── config.py
+│ └── requirements.txt
 ├── terraform/
 │ ├── main.tf
 │ ├── variables.tf

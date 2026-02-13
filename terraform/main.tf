@@ -463,3 +463,8 @@ resource "aws_security_group_rule" "rds_from_vpc" {
   cidr_blocks       = [aws_vpc.main.cidr_block] # 10.0.0.0/16
   description       = "Allow Postgres from VPC (EKS nodes/pods)"
 }
+
+resource "aws_iam_role_policy_attachment" "ec2_ssm_core" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}

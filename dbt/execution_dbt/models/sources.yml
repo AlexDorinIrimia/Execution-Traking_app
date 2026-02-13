@@ -1,0 +1,22 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: public
+    tables:
+      - name: executions
+        description: "Raw execution events ingested by the Flask API."
+        columns:
+          - name: id
+            description: "Surrogate primary key"
+            tests: [not_null, unique]
+          - name: job_name
+            tests: [not_null]
+          - name: run_id
+            tests: [not_null]
+          - name: status
+            tests: [not_null]
+          - name: start_time
+            tests: [not_null]
+          - name: end_time
+            tests: [not_null]
