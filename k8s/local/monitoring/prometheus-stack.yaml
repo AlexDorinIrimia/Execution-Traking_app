@@ -1,0 +1,196 @@
+# k8s/cloud/monitoring/prometheus-stack.yaml
+#
+# Phase 6 – In-cluster monitoring with Prometheus + Grafana
+#
+# Deploys:
+#   1. Prometheus          – scrapes /metrics from the Flask API
+#   2. Grafana             – pre-wired to Prometheus, visualise execution metrics
+#   3. ServiceMonitor      – tells Prometheus which pods to scrape (if using kube-prometheus-stack)
+#
+# Prerequisites (run once):
+#   helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+#   helm repo update
+#   helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+#     --namespace monitoring --create-namespace \
+#     --set grafana.adminPassword=changeme
+#
+# Then apply this file:
+#   kubectl apply -f k8s/cloud/monitoring/prometheus-stack.yaml
+
+---
+# ── Namespace ────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+
+---
+# ── ConfigMap: Prometheus scrape config (standalone, no operator) ────────────
+# Only needed if you are NOT using the kube-prometheus-stack Helm chart.
+# If you installed kube-prometheus-stack, use the ServiceMonitor below instead.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: monitoring
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 30s
+      evaluation_interval: 30s
+
+    scrape_configs:
+      # Scrape the Flask /metrics endpoint
+      - job_name: execution-api
+        metrics_path: /metrics
+        static_configs:
+          - targets:
+              - execution-api-service.default.svc.cluster.local:80
+
+      # Scrape Prometheus itself
+      - job_name: prometheus
+        static_configs:
+          - targets: ["localhost:9090"]
+
+---
+# ── Prometheus Deployment (standalone) ───────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v2.52.0
+          args:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.retention.time=7d"
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - name: config
+              mountPath: /etc/prometheus
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      volumes:
+        - name: config
+          configMap:
+            name: prometheus-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: monitoring
+spec:
+  selector:
+    app: prometheus
+  ports:
+    - port: 9090
+      targetPort: 9090
+
+---
+# ── Grafana Deployment ────────────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana:10.4.2
+          ports:
+            - containerPort: 3000
+          env:
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-secret
+                  key: admin-password
+            # Auto-provision Prometheus as a datasource on startup
+            - name: GF_DATASOURCES_DEFAULT_URL
+              value: "http://prometheus.monitoring.svc.cluster.local:9090"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: grafana-secret
+  namespace: monitoring
+type: Opaque
+stringData:
+  # ⚠️  Replace with a sealed secret or External Secret in production
+  admin-password: REPLACE_WITH_STRONG_PASSWORD
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  # Use ClusterIP internally; access via kubectl port-forward or an Ingress
+  type: ClusterIP
+  selector:
+    app: grafana
+  ports:
+    - port: 3000
+      targetPort: 3000
+
+---
+# ── ServiceMonitor (kube-prometheus-stack operator only) ─────────────────────
+# If you installed kube-prometheus-stack via Helm, add this label to the
+# execution-api-service and deploy this ServiceMonitor. Delete the
+# standalone prometheus Deployment/ConfigMap above.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: execution-api
+  namespace: monitoring
+  labels:
+    # Must match the Helm chart's serviceMonitorSelector label
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app: execution-api
+  namespaceSelector:
+    matchNames:
+      - default
+  endpoints:
+    - port: http          # matches the port name in execution-api Service
+      path: /metrics
+      interval: 30s

@@ -1,12 +1,16 @@
-#for local k8s deployment of postgres
-
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres
+  name: execution-api-service
+  labels:
+    # FIX (monitoring): added label so the Prometheus ServiceMonitor selector
+    # can find this service by app=execution-api
+    app: execution-api
 spec:
+  type: LoadBalancer
   selector:
-    app: postgres
+    app: execution-api
   ports:
-    - port: 5432
-      targetPort: 5432
+    - name: http          # FIX (monitoring): named port required by ServiceMonitor
+      port: 80
+      targetPort: 8000
