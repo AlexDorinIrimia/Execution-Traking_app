@@ -1,0 +1,65 @@
+x-airflow-common: &airflow-common
+  build: .
+  environment:
+    AIRFLOW__CORE__EXECUTOR:                    LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN:        postgresql+psycopg2://airflow:airflow@airflow-db/airflow
+    AIRFLOW__CORE__LOAD_EXAMPLES:               "false"
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+    AIRFLOW__WEBSERVER__SECRET_KEY:             localsecretkey
+    AIRFLOW__LOGGING__REMOTE_LOGGING:           "false"
+    AIRFLOW__WEBSERVER__LOG_FETCH_TIMEOUT_SEC:  "10"
+    INGESTION_API_URL:  http://host.docker.internal:8000
+    DBT_PROJECT_DIR:    /opt/airflow/dbt/execution_dbt
+    DBT_PROFILES_DIR:   /opt/airflow/dbt/execution_dbt
+    DB_HOST:            host.docker.internal
+    DB_PORT:            "5432"
+    DB_NAME:            execution_db
+    DB_USER:            user_exec
+    DB_PASSWORD:        password
+    DB_SSLMODE:         disable
+  volumes:
+    - ../../airflow/dags:/opt/airflow/dags
+    - ../../dbt:/opt/airflow/dbt
+    - airflow_logs:/opt/airflow/logs
+  depends_on:
+    airflow-db:
+      condition: service_healthy
+
+services:
+  airflow-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB:       airflow
+      POSTGRES_USER:     airflow
+      POSTGRES_PASSWORD: airflow
+    volumes:
+      - airflow_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 5s
+      retries: 10
+
+  airflow-init:
+    <<: *airflow-common
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        airflow db migrate
+        airflow users create --username airflow --password airflow --firstname Air --lastname Flow --role Admin --email airflow@example.com
+    restart: "no"
+
+  airflow-webserver:
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    restart: unless-stopped
+
+volumes:
+  airflow_pg_data:
+  airflow_logs:
