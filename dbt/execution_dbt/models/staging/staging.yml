@@ -13,10 +13,10 @@ models:
       - name: status
         tests:
           - not_null
-          # Adjust to the statuses your API uses
+          # FIX: original used `arguments: values: [...]` which is not valid dbt
+          #      test syntax. The correct key directly under accepted_values is `values`.
           - accepted_values:
-              arguments:
-                values: ["success", "failed", "running", "queued", "canceled"]
+              values: ["success", "failed", "running", "queued", "canceled"]
       - name: start_time
         tests: [not_null]
       - name: end_time

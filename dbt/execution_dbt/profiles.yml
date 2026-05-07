@@ -10,4 +10,6 @@ execution_dbt:
       dbname: "{{ env_var('DB_NAME') }}"
       schema: analytics
       threads: 4
-      sslmode: require
+      # FIX: was hardcoded to 'require' which breaks local docker Postgres.
+      # Set DB_SSLMODE=disable in .env for local, require for RDS.
+      sslmode: "{{ env_var('DB_SSLMODE', 'prefer') }}"

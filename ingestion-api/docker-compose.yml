@@ -11,16 +11,32 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-  
+    # FIX: added healthcheck so the API waits until Postgres is actually ready
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user_exec -d execution_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   execution-api:
     build: .
-    env_file:
-      - .env
+    environment:
+      - APP_ENV=local
+      - APP_VERSION=1.0.0
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=execution_db
+      - DB_USER=user_exec
+      - DB_PASSWORD=password
+      # FIX: local Postgres has no SSL — must be disabled
+      - DB_SSLMODE=disable
     ports:
       - "8000:8000"
     depends_on:
-      - postgres
-    restart: always
+      postgres:
+        # FIX: was depends_on without condition — API crashed before DB was ready
+        condition: service_healthy
+    restart: on-failure
 
 volumes:
   postgres_data:
